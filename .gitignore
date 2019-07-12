@@ -3,3 +3,5 @@ datagrand/
 001_crf_baseline/data
 001_crf_baseline/models
 001_crf_baseline/submit
+002_bilstm_crf/data
+002_bilstm_crf/result
