@@ -112,13 +112,14 @@ def bulid_dataset(train_path='data/train.csv',
     getter = SentenceGetter(df)
     sentences = getter.sentences
     # print(len(sentences))
+    print(sentences[0])
     print(len(sentences[:train_size]))
     print(len(sentences[train_size:]))
     # plt.hist([len(s) for s in sentences], bins=50)
     # plt.show()
 
     # 输入长度等长，统一设置为50
-    max_len = 556
+    max_len = 436
     word2idx = {str(w): i for i, w in enumerate(words)}
     tag2idx = {t: i for i, t in enumerate(tags)}
 
@@ -128,8 +129,7 @@ def bulid_dataset(train_path='data/train.csv',
     print("训练数据")
     # 填充句子
     x_train = [[word2idx[w[0]] for w in s] for s in sentences[:train_size]]
-    x_train = pad_sequences(maxlen=max_len, sequences=x_train, padding="post", value=n_words - 1)
-    # print(x[1])
+    x = pad_sequences(maxlen=max_len, sequences=x_train, padding="post", value=n_words - 1)
 
     # 填充标签
     y_train = [[tag2idx[w[1]] for w in s] for s in sentences[:train_size]]
@@ -137,8 +137,13 @@ def bulid_dataset(train_path='data/train.csv',
     # print(y[1])
 
     # 将label转为categorial
-    y_train = [to_categorical(i, num_classes=n_tags) for i in y_train]
-
+    y = [to_categorical(i, num_classes=n_tags) for i in y_train]
+    valid_size = int(0.8 * len(x_train))
+    print(valid_size)
+    x_train = x[:valid_size]
+    y_train = y[:valid_size]
+    x_valid = x[valid_size:]
+    y_valid = y[valid_size:]
     print("测试数据")
     x_test = [[word2idx[w[0]] for w in s] for s in sentences[train_size:]]
     x_test = pad_sequences(maxlen=max_len, sequences=x_test, padding="post", value=n_words - 1)
@@ -152,11 +157,11 @@ def bulid_dataset(train_path='data/train.csv',
     with open(dataset_dir, 'wb') as out_data:
         pickle.dump([n_words, n_tags, max_len, words, tags,
                      x_train, y_train,
-                     x_test, y_test],
+                     x_test, y_test, x_valid, y_valid],
                     out_data, pickle.HIGHEST_PROTOCOL)
 
     return n_words, n_tags, max_len, words, tags, \
-           x_train, y_train, x_test, y_test
+           x_train, y_train, x_test, y_test, x_valid, y_valid
 
 
 if __name__ == '__main__':
@@ -168,5 +173,4 @@ if __name__ == '__main__':
     save_path = 'data/test.csv'
     transfer_format(open_path, save_path, flag='1test')
 
-    data_dir = 'data/ner_dataset.csv'
     bulid_dataset()
