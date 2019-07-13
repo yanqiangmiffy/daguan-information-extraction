@@ -87,14 +87,11 @@ def bulid_dataset(train_path='data/train.csv',
     """
     df_train = pd.read_csv(train_path)
     train_size = len(df_train['sent_idx'].unique())
-    print(train_size)
     df_test = pd.read_csv(test_path)
-    test_size = len(df_test['sent_idx'].unique())
-    print(test_size)
+    # test_size = len(df_test['sent_idx'].unique())
 
     df = pd.concat([df_train, df_test], axis=0)
-    df_size = len(df['sent_idx'].unique())
-    print(df_size)
+    # df_size = len(df['sent_idx'].unique())
     df['char'] = df['char'].astype('str')
     if os.path.exists(dataset_dir):
         print("正在加载旧数据")

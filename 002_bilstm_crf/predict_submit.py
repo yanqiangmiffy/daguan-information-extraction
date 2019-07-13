@@ -139,10 +139,57 @@ def submit(pred_path, result_path):
     f2.close()
 
 
+def micro_f1(sub_lines, ans_lines, split=' '):
+    correct = []
+    total_sub = 0
+    total_ans = 0
+    for sub_line, ans_line in zip(sub_lines, ans_lines):
+        sub_line = set(str(sub_line).split(split))
+        ans_line = set(str(ans_line).split(split))
+        c = sum(1 for i in sub_line if i in ans_line) if sub_line != {''} else 0
+        total_sub += len(sub_line) if sub_line != {''} else 0
+        total_ans += len(ans_line) if ans_line != {''} else 0
+        correct.append(c)
+    p = np.sum(correct) / total_sub if total_sub != 0 else 0
+    r = np.sum(correct) / total_ans if total_ans != 0 else 0
+    f1 = 2 * p * r / (p + r) if (p + r) != 0 else 0
+    print('total sub:', total_sub)
+    print('total ans:', total_ans)
+    print('correct: ', np.sum(correct), correct)
+    print('precision: ', p)
+    print('recall: ', r)
+    print('f1', f1)
+
+
+def evaluate():
+    all=[]
+    with open('../datagrand/train.txt') as f:
+        for ff in f:
+            t = ff.strip().split('  ')
+            all.append(t)
+    length=len(all)
+    print(length)
+    valid_size = int(0.8 * length)
+    train=all[:valid_size]
+    print("valid_size",valid_size)
+    valid=all[valid_size:]
+    train_pred = []
+    with open('submit/train_result.txt') as f:
+        for ff in f:
+            t = ff.strip().split('  ')
+            train_pred.append(t)
+    valid_pred = []
+    with open('submit/valid_result.txt') as f:
+        for ff in f:
+            t = ff.strip().split('  ')
+            valid_pred.append(t)
+    micro_f1(train,train_pred)
+    micro_f1(valid,valid_pred)
 if __name__ == '__main__':
-    predict(x_train, y_train, pred_path='submit/train_pred.txt')
-    predict(x_valid, y_valid, pred_path='submit/valid_pred.txt')
-    predict(x_test, y_test, pred_path='submit/test_pred.txt')
-    submit('submit/train_pred.txt','submit/train_result.txt')
-    submit('submit/valid_pred.txt','submit/valid_result.txt')
-    submit('submit/test_pred.txt','submit/test_result.txt')
+    # predict(x_train, y_train, pred_path='submit/train_pred.txt')
+    # predict(x_valid, y_valid, pred_path='submit/valid_pred.txt')
+    # predict(x_test, y_test, pred_path='submit/test_pred.txt')
+    # submit('submit/train_pred.txt','submit/train_result.txt')
+    # submit('submit/valid_pred.txt','submit/valid_result.txt')
+    # submit('submit/test_pred.txt','submit/test_result.txt')
+    evaluate()
