@@ -62,7 +62,7 @@ if __name__ == '__main__':
         print('train {}'.format(i))
         os.system("crf_learn "
                   "-f 3 "
-                  "-c 1.5 "
+                  "-c 4 "
                   "template "
                   "data/train_ner_cv_{}.txt  "
                   "models/train_model_{} ".format(i, i))
@@ -83,11 +83,11 @@ if __name__ == '__main__':
                   "submit/submit_validate_ner_cv_predict_{}.txt".format(i, i, i))
 
         os.system("python 001.make_submit.py "
-                  "-submit_file data/validate_cv_{}.txt "
+                  "-submit_file data/validate_date/validate_cv_{}.txt "
                   "-predict_file submit/submit_validate_ner_cv_predict_{}.txt ".format(i, i)
                   )
 
-        with open('data/validate_cv_{}.txt'.format(i)) as f:
+        with open('data/validate_date/validate_cv_{}.txt'.format(i)) as f:
             for ff in f:
                 t = ff.split('  ')
                 predict.append(t)

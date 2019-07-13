@@ -144,6 +144,7 @@ def micro_f1(sub_lines, ans_lines, split=' '):
     total_sub = 0
     total_ans = 0
     for sub_line, ans_line in zip(sub_lines, ans_lines):
+        print(sub_line)
         sub_line = set(str(sub_line).split(split))
         ans_line = set(str(ans_line).split(split))
         c = sum(1 for i in sub_line if i in ans_line) if sub_line != {''} else 0
