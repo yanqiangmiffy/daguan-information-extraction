@@ -6,3 +6,4 @@ datagrand/
 002_bilstm_crf/data
 002_bilstm_crf/models
 002_bilstm_crf/submit
+003_daguan_named_entity_recognition/charEmbedding_300dim

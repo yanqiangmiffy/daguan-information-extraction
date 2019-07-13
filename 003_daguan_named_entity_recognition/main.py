@@ -1,4 +1,3 @@
-
 from data import build_corpus
 from utils import extend_maps, prepocess_data_for_lstmcrf
 from evaluate import bilstm_train_and_eval, ensemble_evaluate
@@ -9,6 +8,8 @@ from gensim.models import Word2Vec
 import argparse
 import torch
 import random
+
+
 def main():
     """训练模型，评估结果"""
 
@@ -21,25 +22,25 @@ def main():
 
     # 训练评估ｈｍｍ模型
     # print("正在训练评估HMM模型...")
-    with open('corpus_word2id','rb') as f:
-        word2id=pickle.load(f)
-    with open('tag2id','rb') as f:
-        tag2id=pickle.load(f)
+    with open('corpus_word2id', 'rb') as f:
+        word2id = pickle.load(f)
+    with open('tag2id', 'rb') as f:
+        tag2id = pickle.load(f)
     # print('word2id',word2id)
     # print('tag2id',tag2id)
-    train_word_lists=[]
-    train_tag_lists=[]
-    f=open('normal_daguan_train.txt')
-    datas=f.readlines()
+    train_word_lists = []
+    train_tag_lists = []
+    f = open('normal_daguan_train.txt')
+    datas = f.readlines()
     f.close()
     for data in datas:
-        temps=data.strip().split('|||')
-        words=temps[0]
-        tags=temps[1]
+        temps = data.strip().split('|||')
+        words = temps[0]
+        tags = temps[1]
         train_word_lists.append(words.split(' '))
         train_tag_lists.append(tags.split(' '))
-    test_word_lists=[]
-    test_tag_lists=[]
+    test_word_lists = []
+    test_tag_lists = []
     f = open('normal_daguan_test.txt')
     datas = f.readlines()
     f.close()
@@ -52,8 +53,8 @@ def main():
     dev_tag_lists = train_tag_lists[:1500]
     # test_word_lists = train_word_lists[1500:3000]
     # test_tag_lists = train_tag_lists[1500:3000]
-    train_word_lists=train_word_lists[1500:]
-    train_tag_lists=train_tag_lists[1500:]
+    train_word_lists = train_word_lists[1500:]
+    train_tag_lists = train_tag_lists[1500:]
     '''后3000数据集划分'''
     # dev_word_lists = train_word_lists[-3000:-1500]
     # dev_tag_lists = train_tag_lists[-3000:-1500]
@@ -65,7 +66,7 @@ def main():
     # print(train_tag_lists[0])
     # print(test_word_lists[0])
     # print(len(train_tag_lists)
-     #
+    #
     print("正在训练评估Bi-LSTM+CRF模型...")
     # 如果是加了CRF的lstm还要加入<start>和<end> (解码的时候需要用到)
     crf_word2id, crf_tag2id = extend_maps(word2id, tag2id, for_crf=True)
@@ -80,7 +81,7 @@ def main():
     test_word_lists, test_tag_lists = prepocess_data_for_lstmcrf(
         test_word_lists, test_tag_lists,
     )
-    model=Word2Vec.load('charEmbedding_300dim')
+    model = Word2Vec.load('charEmbedding_300dim')
     weights = np.zeros(shape=(len(crf_word2id), 300))
     for word in word2id.keys():
         if word in model.wv.vocab:
@@ -92,7 +93,7 @@ def main():
         (dev_word_lists, dev_tag_lists),
         (test_word_lists, test_tag_lists),
         # (dev_word_lists, dev_tag_lists),
-        weights,crf_word2id, crf_tag2id
+        weights, crf_word2id, crf_tag2id
     )
     # f = open('/home/huang/Desktop/named_entity_recognition/next_dev_results.txt', 'a')
     # f.write(' '.join(lstmcrf_pred) + '\n')

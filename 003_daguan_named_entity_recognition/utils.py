@@ -2,8 +2,6 @@ import pickle
 from gensim.models import Word2Vec
 
 
-
-
 def save_model(model, file_name):
     """用于保存模型"""
     with open(file_name, "wb") as f:
@@ -53,33 +51,35 @@ def flatten_lists(lists):
         else:
             flatten_list.append(l)
     return flatten_list
+
+
 def train_format_transfer():
-    f=open('daguan_train.txt','r',encoding='utf8')
-    datas=f.readlines()
+    f = open('daguan_train.txt', 'r', encoding='utf8')
+    datas = f.readlines()
     f.close()
-    f=open('normal_daguan_train.txt','w')
-    all_words=set()
-    all_labels=set()
+    f = open('normal_daguan_train.txt', 'w')
+    all_words = set()
+    all_labels = set()
     all_labels.add('o')
     for data in datas:
-        words=[]
-        labels=[]
+        words = []
+        labels = []
         for texts in data.strip().split('  '):
-            label=texts[-1]
-            texts=texts[:-2].split('_')
-            length=len(texts)
-            if label=='o':
+            label = texts[-1]
+            texts = texts[:-2].split('_')
+            length = len(texts)
+            if label == 'o':
                 for i in range(length):
                     words.append(texts[i])
                     all_words.add(texts[i])
                     labels.append('o')
             else:
-                if length==1:
-                    all_labels.add(label+'-S')
+                if length == 1:
+                    all_labels.add(label + '-S')
                     all_words.add(texts[0])
-                    labels.append(label+'-S')
+                    labels.append(label + '-S')
                     words.append(texts[0])
-                elif length==2:
+                elif length == 2:
                     all_labels.add(label + '-B')
                     all_labels.add(label + '-E')
                     all_words.add(texts[0])
@@ -88,7 +88,7 @@ def train_format_transfer():
                     labels.append(label + '-E')
                     words.append(texts[0])
                     words.append(texts[1])
-                elif length>2:
+                elif length > 2:
                     all_labels.add(label + '-B')
                     all_labels.add(label + '-M')
                     all_labels.add(label + '-E')
@@ -96,116 +96,124 @@ def train_format_transfer():
                     all_words.add(texts[-1])
                     labels.append(label + '-B')
                     words.append(texts[0])
-                    for i in range(1,length-1):
+                    for i in range(1, length - 1):
                         labels.append(label + '-M')
                         words.append(texts[i])
                         all_words.add(texts[i])
                     labels.append(label + '-E')
                     words.append(texts[-1])
-        f.write(' '.join(words)+'|||'+' '.join(labels)+'\n')
-    word2id={}
-    label2id={}
+        f.write(' '.join(words) + '|||' + ' '.join(labels) + '\n')
+    word2id = {}
+    label2id = {}
     for word in all_words:
-        word2id[word]=len(word2id)
+        word2id[word] = len(word2id)
     for label in all_labels:
-        label2id[label]=len(label2id)
-    with open('word2id','wb') as f:
-        pickle.dump(word2id,f)
+        label2id[label] = len(label2id)
+    with open('word2id', 'wb') as f:
+        pickle.dump(word2id, f)
     with open('tag2id', 'wb') as f:
-        pickle.dump(label2id,f)
+        pickle.dump(label2id, f)
     print(word2id)
     print(label2id)
     f.close()
 
+
 def test_format_transfer():
-    f=open('daguan_test.txt','r',encoding='utf8')
-    datas=f.readlines()
+    f = open('daguan_test.txt', 'r', encoding='utf8')
+    datas = f.readlines()
     f.close()
-    f=open('normal_daguan_test.txt','w')
+    f = open('normal_daguan_test.txt', 'w')
     for data in datas:
-        words=[]
+        words = []
         for texts in data.strip().split('  '):
-            texts=texts.split('_')
+            texts = texts.split('_')
 
-            f.write(' '.join(texts)+'\n')
+            f.write(' '.join(texts) + '\n')
     f.close()
+
+
 def corpus_format_transfer():
-    f=open('corpus.txt','r',encoding='utf8')
-    datas=f.readlines()
+    f = open('corpus.txt', 'r', encoding='utf8')
+    datas = f.readlines()
     f.close()
-    f=open('daguan_languagemodel_corpus.txt','w')
+    f = open('daguan_languagemodel_corpus.txt', 'w')
     for data in datas:
         for texts in data.strip().split('  '):
-            texts=texts.split('_')
+            texts = texts.split('_')
 
-            f.write(' '.join(texts)+'\n')
+            f.write(' '.join(texts) + '\n')
     f.close()
+
 
 def submitFormat():
-    f=open('daguan_bilstmcrf_result.txt')
-    labels=f.readlines()
+    f = open('daguan_bilstmcrf_result.txt')
+    labels = f.readlines()
     f.close()
-    f=open('daguan_test.txt')
-    texts=f.readlines()
+    f = open('daguan_test.txt')
+    texts = f.readlines()
     f.close()
-    f=open('result_layer_3.txt','w',encoding='utf8')
-    for i,label in enumerate(labels):
+    f = open('result_layer_3.txt', 'w', encoding='utf8')
+    for i, label in enumerate(labels):
 
-        label=label.strip().split(' ')
-        text=texts[i].strip().split('_')
-        print(len(label),len(text))
-        length=len(label)
-        start=0
-        end=0
-        result=[]
-        print(i,label)
-        while length>0:
+        label = label.strip().split(' ')
+        text = texts[i].strip().split('_')
+        print(len(label), len(text))
+        length = len(label)
+        start = 0
+        end = 0
+        result = []
+        print(i, label)
+        while length > 0:
             if label[end] == 'o':
                 while label[end] == 'o':
-                    end+=1
-                    length-=1
-                    if length==0:
+                    end += 1
+                    length -= 1
+                    if length == 0:
                         break
-                result.append('_'.join(text[start:end])+'/o')
-                start=end
-                if start==len(label):
+                result.append('_'.join(text[start:end]) + '/o')
+                start = end
+                if start == len(label):
                     break
             if 'S' in label[end]:
                 # print(text[start:end] +'/'+label[end][0])
-                result.append('_'.join(text[start:end+1]) +'/'+label[end][0])
-                end+=1
-                length-=1
-                start=end
+                result.append('_'.join(text[start:end + 1]) + '/' + label[end][0])
+                end += 1
+                length -= 1
+                start = end
                 if length == 0:
                     break
             if 'B' in label[end]:
                 while 'E' not in label[end]:
-                    end+=1
-                    length-=1
-                    if length==0:
+                    end += 1
+                    length -= 1
+                    if length == 0:
                         break
                 end += 1
                 length -= 1
-                result.append('_'.join(text[start:end])+'/'+label[start][0])
-                start=end
-                if start==len(label):
+                result.append('_'.join(text[start:end]) + '/' + label[start][0])
+                start = end
+                if start == len(label):
                     break
             # if '' in label[end]:
-        f.write('  '.join(result)+'\n')
+        f.write('  '.join(result) + '\n')
     f.close()
+
+
 # submitFormat()
 def trainCharEmbedding():
-    f=open('../datagrand/corpus.txt')
-    datas=f.readlines()
+    f = open('../datagrand/corpus.txt')
+    datas = f.readlines()
     f.close()
-    texts=[]
+    texts = []
     for data in datas:
-        words=data.strip().split('_')
+        words = data.strip().split('_')
         texts.append(words)
     print(len(texts))
-    model = Word2Vec(texts, size=300, iter=20, min_count=0, min_alpha=0, sg=1, hs=1,workers=64)
+    model = Word2Vec(texts, size=300, iter=20, min_count=0, min_alpha=0, sg=1, hs=1, workers=64)
     model.save('charEmbedding_300dim')
-trainCharEmbedding()
+
+
+# trainCharEmbedding()
 
 def get_ner_fmeasure(golden_lists, predict_lists, label_type="BMES"):
     sent_num = len(golden_lists)
@@ -214,7 +222,7 @@ def get_ner_fmeasure(golden_lists, predict_lists, label_type="BMES"):
     right_full = []
     right_tag = 0
     all_tag = 0
-    for idx in range(0,sent_num):
+    for idx in range(0, sent_num):
         # word_list = sentence_lists[idx]
         golden_list = golden_lists[idx]
         predict_list = predict_lists[idx]
@@ -240,19 +248,19 @@ def get_ner_fmeasure(golden_lists, predict_lists, label_type="BMES"):
     if predict_num == 0:
         precision = -1
     else:
-        precision =  (right_num+0.0)/predict_num
+        precision = (right_num + 0.0) / predict_num
     if golden_num == 0:
         recall = -1
     else:
-        recall = (right_num+0.0)/golden_num
-    if (precision == -1) or (recall == -1) or (precision+recall) <= 0.:
+        recall = (right_num + 0.0) / golden_num
+    if (precision == -1) or (recall == -1) or (precision + recall) <= 0.:
         f_measure = -1
     else:
-        f_measure = 2*precision*recall/(precision+recall)
-    accuracy = (right_tag+0.0)/all_tag
+        f_measure = 2 * precision * recall / (precision + recall)
+    accuracy = (right_tag + 0.0) / all_tag
     # print "Accuracy: ", right_tag,"/",all_tag,"=",accuracy
-    print ("gold_num = ", golden_num, " pred_num = ", predict_num, " right_num = ", right_num)
-    print('accuracy=',accuracy,' precision=',precision,' recall=',recall,' f_measure=',f_measure)
+    print("gold_num = ", golden_num, " pred_num = ", predict_num, " right_num = ", right_num)
+    print('accuracy=', accuracy, ' precision=', precision, ' recall=', recall, ' f_measure=', f_measure)
     return str(accuracy), str(precision), str(recall), str(f_measure)
 
 
@@ -301,6 +309,8 @@ def get_ner_BMES(label_list):
             stand_matrix.append(insert_list)
     # print stand_matrix
     return stand_matrix
+
+
 def get_ner_BIO(label_list):
     # list_len = len(word_list)
     # assert(list_len == len(label_list)), "word list size unmatch with label list"
@@ -316,37 +326,39 @@ def get_ner_BIO(label_list):
         current_label = label_list[i].upper()
         if begin_label in current_label:
             if index_tag == '':
-                whole_tag = current_label.replace(begin_label,"",1) +'[' +str(i)
-                index_tag = current_label.replace(begin_label,"",1)
+                whole_tag = current_label.replace(begin_label, "", 1) + '[' + str(i)
+                index_tag = current_label.replace(begin_label, "", 1)
             else:
-                tag_list.append(whole_tag + ',' + str(i-1))
-                whole_tag = current_label.replace(begin_label,"",1)  + '[' + str(i)
-                index_tag = current_label.replace(begin_label,"",1)
+                tag_list.append(whole_tag + ',' + str(i - 1))
+                whole_tag = current_label.replace(begin_label, "", 1) + '[' + str(i)
+                index_tag = current_label.replace(begin_label, "", 1)
 
         elif inside_label in current_label:
-            if current_label.replace(inside_label,"",1) == index_tag:
+            if current_label.replace(inside_label, "", 1) == index_tag:
                 whole_tag = whole_tag
             else:
-                if (whole_tag != '')&(index_tag != ''):
-                    tag_list.append(whole_tag +',' + str(i-1))
+                if (whole_tag != '') & (index_tag != ''):
+                    tag_list.append(whole_tag + ',' + str(i - 1))
                 whole_tag = ''
                 index_tag = ''
         else:
-            if (whole_tag != '')&(index_tag != ''):
-                tag_list.append(whole_tag +',' + str(i-1))
+            if (whole_tag != '') & (index_tag != ''):
+                tag_list.append(whole_tag + ',' + str(i - 1))
             whole_tag = ''
             index_tag = ''
 
-    if (whole_tag != '')&(index_tag != ''):
+    if (whole_tag != '') & (index_tag != ''):
         tag_list.append(whole_tag)
     tag_list_len = len(tag_list)
 
     for i in range(0, tag_list_len):
-        if  len(tag_list[i]) > 0:
-            tag_list[i] = tag_list[i]+ ']'
+        if len(tag_list[i]) > 0:
+            tag_list[i] = tag_list[i] + ']'
             insert_list = reverse_style(tag_list[i])
             stand_matrix.append(insert_list)
     return stand_matrix
+
+
 def reverse_style(input_string):
     target_position = input_string.index('[')
     input_len = len(input_string)
