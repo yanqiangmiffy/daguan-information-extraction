@@ -146,10 +146,10 @@ def corpus_format_transfer():
 
 
 def submitFormat():
-    f = open('daguan_bilstmcrf_result.txt')
+    f = open('next_dev_result/1.453_bilstmcrf_result.txt')
     labels = f.readlines()
     f.close()
-    f = open('daguan_test.txt')
+    f = open('../datagrand/test.txt')
     texts = f.readlines()
     f.close()
     f = open('result_layer_3.txt', 'w', encoding='utf8')

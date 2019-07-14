@@ -2,8 +2,6 @@ import torch
 import torch.nn.functional as F
 
 
-
-
 # ******** LSTM模型 工具函数*************
 
 def tensorized(batch, maps):
@@ -60,6 +58,7 @@ def cal_loss(logits, targets, tag2id):
 
     return loss
 
+
 # FOR BiLSTM-CRF
 
 
@@ -89,7 +88,7 @@ def cal_lstm_crf_loss(crf_scores, targets, tag2id):
 
     flatten_scores = crf_scores.masked_select(
         mask.view(batch_size, max_len, 1, 1).expand_as(crf_scores)
-    ).view(-1, target_size*target_size).contiguous()
+    ).view(-1, target_size * target_size).contiguous()
 
     golden_scores = flatten_scores.gather(
         dim=1, index=targets.unsqueeze(1)).sum()
@@ -111,7 +110,7 @@ def cal_lstm_crf_loss(crf_scores, targets, tag2id):
         batch_size_t = (lengths > t).sum().item()
         if t == 0:
             scores_upto_t[:batch_size_t] = crf_scores[:batch_size_t,
-                                                      t, start_id, :]
+                                           t, start_id, :]
         else:
             # We add scores at current timestep to scores accumulated up to previous
             # timestep, and log-sum-exp Remember, the cur_tag of the previous
@@ -133,7 +132,7 @@ def cal_lstm_crf_loss(crf_scores, targets, tag2id):
 def indexed(targets, tagset_size, start_id):
     """将targets中的数转化为在[T*T]大小序列中的索引,T是标注的种类"""
     batch_size, max_len = targets.size()
-    for col in range(max_len-1, 0, -1):
-        targets[:, col] += (targets[:, col-1] * tagset_size)
+    for col in range(max_len - 1, 0, -1):
+        targets[:, col] += (targets[:, col - 1] * tagset_size)
     targets[:, 0] += (start_id * tagset_size)
     return targets
