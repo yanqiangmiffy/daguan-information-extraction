@@ -16,3 +16,7 @@
 - Named-Entity-Recognition-BidirectionalLSTM-CNN-CoNLL
 
     https://github.com/mxhofer/Named-Entity-Recognition-BidirectionalLSTM-CNN-CoNLL
+    
+- jiesutd/LatticeLSTM
+
+    https://github.com/jiesutd/LatticeLSTM

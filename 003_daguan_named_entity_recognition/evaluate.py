@@ -1,10 +1,7 @@
 import time
-from collections import Counter
 
 from models.bilstm_crf import BILSTM_Model
-from utils import save_model, flatten_lists,get_ner_fmeasure
-import numpy as np
-import torch
+from utils import save_model
 
 
 
@@ -31,31 +28,5 @@ def bilstm_train_and_eval(train_data, dev_data, test_data,
     for pred_tag_list in pred_tag_lists:
         f.write(' '.join(pred_tag_list) + '\n')
     f.close()
-    # metrics=get_ner_fmeasure(test_tag_lists,pred_tag_lists)
-    # f=open('previous_dev_results.txt','a')
-    # f.write(' '.join(metrics)+'\n')
-    # f.close()
-    # metrics = Metrics(test_tag_lists, pred_tag_lists, remove_O=remove_O)
-    # metrics.report_scores()
-    # metrics.report_confusion_matrix()
-
-    # return metrics
 
 
-def ensemble_evaluate(results, targets, remove_O=False):
-    """ensemble多个模型"""
-    for i in range(len(results)):
-        results[i] = flatten_lists(results[i])
-
-    pred_tags = []
-    for result in zip(*results):
-        ensemble_tag = Counter(result).most_common(1)[0][0]
-        pred_tags.append(ensemble_tag)
-
-    targets = flatten_lists(targets)
-    assert len(pred_tags) == len(targets)
-
-    print("Ensemble 四个模型的结果如下：")
-    metrics = Metrics(targets, pred_tags, remove_O=remove_O)
-    metrics.report_scores()
-    metrics.report_confusion_matrix()

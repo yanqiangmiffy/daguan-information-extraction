@@ -1,10 +1,11 @@
 import torch
 import torch.nn as nn
 from torch.nn.utils.rnn import pad_packed_sequence, pack_padded_sequence
-from torch.nn import  functional as F
+from torch.nn import functional as F
+
 
 class BiLSTM(nn.Module):
-    def __init__(self, vocab_size, emb_size,weight, hidden_size, out_size):
+    def __init__(self, vocab_size, emb_size, weight, hidden_size, out_size):
         """初始化参数：
             vocab_size:字典的大小
             emb_size:词向量的维数
@@ -18,11 +19,11 @@ class BiLSTM(nn.Module):
         # self.embedding.weight.data.copy_(torch.Tensor(weight))
         # self.dropout1=nn.Dropout(0.5)
         self.lstm = nn.LSTM(emb_size, hidden_size,
-                              batch_first=True,
-                              bidirectional=True,num_layers=3,dropout=0.5)
+                            batch_first=True,
+                            bidirectional=True, num_layers=3, dropout=0.5)
         self.embed_drop = nn.Dropout(0.8)
-        self.conv1=nn.Conv1d(emb_size,100,3,padding=1)
-        self.dense1=nn.Linear(50,50)
+        self.conv1 = nn.Conv1d(emb_size, 100, 3, padding=1)
+        self.dense1 = nn.Linear(50, 50)
         self.conv2 = nn.Conv1d(emb_size, 100, 5, padding=2)
         self.dense2 = nn.Linear(50, 50)
         # self.conv3 = nn.Conv1d(emb_size, 50, 7, padding=3)
@@ -30,10 +31,11 @@ class BiLSTM(nn.Module):
         self.conv4 = nn.Conv1d(emb_size, 100, 1, padding=0)
         self.dense3 = nn.Linear(50, 50)
         self.lin = nn.Linear(2 * hidden_size, hidden_size)
-        self.lin_drop=nn.Dropout(0.5)
+        self.lin_drop = nn.Dropout(0.5)
         self.output = nn.Linear(hidden_size, out_size)
 
         # self.dropout2=nn.Dropout(0.2)
+
     def forward(self, sents_tensor, lengths):
         # print(sents_tensor.size(),lengths)
         emb = self.preTrainembedding(sents_tensor)  # [B, L, emb_size]
@@ -57,9 +59,9 @@ class BiLSTM(nn.Module):
         # rnn_out=torch.cat([rnn_out,conv],dim=2)
         # rnn_out:[B, L, hidden_size*2]
         rnn_out, _ = pad_packed_sequence(rnn_out, batch_first=True)
-        lin = self.lin(rnn_out) # [B, L, out_size]
-        lin=self.lin_drop(lin)
-        scores=self.output(lin)
+        lin = self.lin(rnn_out)  # [B, L, out_size]
+        lin = self.lin_drop(lin)
+        scores = self.output(lin)
         return scores
 
     def test(self, sents_tensor, lengths, _):
